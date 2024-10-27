@@ -94,11 +94,11 @@
         (let (
             (input-reserve (if is-x-to-y (get reserve-x pool) (get reserve-y pool)))
             (output-reserve (if is-x-to-y (get reserve-y pool) (get reserve-x pool)))
-            (input-with-fee (mul input-amount (- FEE-DENOMINATOR TOTAL-FEE)))
-            (numerator (mul input-with-fee output-reserve))
-            (denominator (add (mul input-reserve FEE-DENOMINATOR) input-with-fee))
+            (input-with-fee (* input-amount (- FEE-DENOMINATOR TOTAL-FEE)))
+            (numerator (* input-with-fee output-reserve))
+            (denominator (+ (* input-reserve FEE-DENOMINATOR) input-with-fee))
         )
-        (ok (div numerator denominator)))
+        (ok (/ numerator denominator)))
         (err ERR-POOL-NOT-FOUND)
     )
 )
@@ -258,8 +258,8 @@
     (amount-y uint)
 )
     (let (
-        (share-ratio-x (div (* amount-x (get total-shares pool)) (get reserve-x pool)))
-        (share-ratio-y (div (* amount-y (get total-shares pool)) (get reserve-y pool)))
+        (share-ratio-x (/ (* amount-x (get total-shares pool)) (get reserve-x pool)))
+        (share-ratio-y (/ (* amount-y (get total-shares pool)) (get reserve-y pool)))
     )
     (if (< share-ratio-x share-ratio-y)
         share-ratio-x
