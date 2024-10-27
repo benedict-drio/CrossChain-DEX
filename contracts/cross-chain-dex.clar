@@ -39,3 +39,12 @@
         last-block-height: uint
     }
 )
+
+(define-map liquidity-providers
+    { pool-id: uint, provider: principal }
+    {
+        shares: uint,
+        token-x-deposited: uint,
+        token-y-deposited: uint
+    }
+)
