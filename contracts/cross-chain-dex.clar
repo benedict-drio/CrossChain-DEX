@@ -48,3 +48,16 @@
         token-y-deposited: uint
     }
 )
+
+(define-map orders
+    { order-id: uint }
+    {
+        maker: principal,
+        token-x: principal,
+        token-y: principal,
+        amount-x: uint,
+        min-amount-y: uint,
+        expiry: uint,
+        status: (string-ascii 20)
+    }
+)
