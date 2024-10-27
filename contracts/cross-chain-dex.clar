@@ -267,3 +267,15 @@
         share-ratio-y
     ))
 )
+
+
+;; Initialize contract
+(define-data-var total-pools uint u0)
+
+;; Contract management functions
+(define-public (set-contract-owner (new-owner principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-AUTHORIZED)
+        (ok (var-set contract-owner new-owner))
+    )
+)
