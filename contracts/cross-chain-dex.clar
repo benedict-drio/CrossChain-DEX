@@ -72,3 +72,12 @@
         (get-symbol () (response (string-ascii 32) uint))
     )
 )
+
+;; Read-only functions
+
+(define-read-only (get-pool-details (pool-id uint))
+    (match (map-get? pools { pool-id: pool-id })
+        pool pool
+        (err ERR-POOL-NOT-FOUND)
+    )
+)
