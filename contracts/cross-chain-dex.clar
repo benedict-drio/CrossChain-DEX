@@ -12,3 +12,10 @@
 (define-constant ERR-SLIPPAGE-TOO-HIGH (err u104))
 (define-constant ERR-INVALID-PAIR (err u105))
 (define-constant ERR-ZERO-LIQUIDITY (err u106))
+
+;; Constants for fee calculation and pool management
+(define-constant FEE-DENOMINATOR u10000)
+(define-constant PROTOCOL-FEE u3) ;; 0.03%
+(define-constant LP-FEE u27)      ;; 0.27%
+(define-constant TOTAL-FEE u30)   ;; 0.3%
+(define-constant MINIMUM-LIQUIDITY u1000)
