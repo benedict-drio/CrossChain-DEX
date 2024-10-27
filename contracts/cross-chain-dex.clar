@@ -81,3 +81,10 @@
         (err ERR-POOL-NOT-FOUND)
     )
 )
+
+(define-read-only (get-provider-shares (pool-id uint) (provider principal))
+    (default-to 
+        { shares: u0, token-x-deposited: u0, token-y-deposited: u0 }
+        (map-get? liquidity-providers { pool-id: pool-id, provider: provider })
+    )
+)
