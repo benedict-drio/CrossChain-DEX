@@ -88,3 +88,18 @@
         (map-get? liquidity-providers { pool-id: pool-id, provider: provider })
     )
 )
+
+(define-read-only (calculate-swap-output (pool-id uint) (input-amount uint) (is-x-to-y bool))
+    (match (map-get? pools { pool-id: pool-id })
+        pool 
+        (let (
+            (input-reserve (if is-x-to-y (get reserve-x pool) (get reserve-y pool)))
+            (output-reserve (if is-x-to-y (get reserve-y pool) (get reserve-x pool)))
+            (input-with-fee (mul input-amount (- FEE-DENOMINATOR TOTAL-FEE)))
+            (numerator (mul input-with-fee output-reserve))
+            (denominator (add (mul input-reserve FEE-DENOMINATOR) input-with-fee))
+        )
+        (ok (div numerator denominator)))
+        (err ERR-POOL-NOT-FOUND)
+    )
+)
