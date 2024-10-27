@@ -1,6 +1,5 @@
 ;; Cross-Chain DEX Smart Contract
 ;; Implements liquidity pools, order matching, and cross-chain swaps
-;; Version: 1.0.0
 
 (impl-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
 
@@ -268,7 +267,6 @@
     ))
 )
 
-
 ;; Initialize contract
 (define-data-var total-pools uint u0)
 
@@ -277,5 +275,12 @@
     (begin
         (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-AUTHORIZED)
         (ok (var-set contract-owner new-owner))
+    )
+)
+
+(define-public (toggle-emergency-shutdown)
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-AUTHORIZED)
+        (ok (var-set emergency-shutdown (not (var-get emergency-shutdown))))
     )
 )
