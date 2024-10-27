@@ -190,3 +190,48 @@
     
     (ok shares-to-mint))
 )
+
+(define-public (swap-exact-tokens (pool-id uint) (amount-in uint) (min-amount-out uint) (is-x-to-y bool))
+    (let (
+        (caller tx-sender)
+        (pool (unwrap! (map-get? pools { pool-id: pool-id }) ERR-POOL-NOT-FOUND))
+        (amount-out (unwrap! (calculate-swap-output pool-id amount-in is-x-to-y) ERR-INVALID-AMOUNT))
+    )
+    
+    ;; Verify output amount meets minimum
+    (asserts! (>= amount-out min-amount-out) ERR-SLIPPAGE-TOO-HIGH)
+    
+    ;; Transfer input tokens to contract
+    (if is-x-to-y
+        (try! (contract-call? (get token-x pool) transfer amount-in caller (as-contract tx-sender) none))
+        (try! (contract-call? (get token-y pool) transfer amount-in caller (as-contract tx-sender) none))
+    )
+    
+    ;; Transfer output tokens to user
+    (if is-x-to-y
+        (try! (as-contract (contract-call? (get token-y pool) transfer amount-out (as-contract tx-sender) caller none)))
+        (try! (as-contract (contract-call? (get token-x pool) transfer amount-out (as-contract tx-sender) caller none)))
+    )
+    
+    ;; Update pool reserves
+    (map-set pools
+        { pool-id: pool-id }
+        {
+            token-x: (get token-x pool),
+            token-y: (get token-y pool),
+            reserve-x: (if is-x-to-y 
+                (+ (get reserve-x pool) amount-in)
+                (- (get reserve-x pool) amount-out)),
+            reserve-y: (if is-x-to-y
+                (- (get reserve-y pool) amount-out)
+                (+ (get reserve-y pool) amount-in)),
+            total-shares: (get total-shares pool),
+            accumulated-fees-x: (get accumulated-fees-x pool),
+            accumulated-fees-y: (get accumulated-fees-y pool),
+            last-block-height: block-height
+        }
+    )
+    
+    (ok amount-out))
+)
+
