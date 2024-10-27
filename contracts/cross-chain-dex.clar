@@ -146,3 +146,47 @@
     
     (ok pool-id))
 )
+
+(define-public (add-liquidity (pool-id uint) (amount-x uint) (amount-y uint) (min-shares uint))
+    (let (
+        (caller tx-sender)
+        (pool (unwrap! (map-get? pools { pool-id: pool-id }) ERR-POOL-NOT-FOUND))
+        (shares-to-mint (calculate-liquidity-shares pool amount-x amount-y))
+    )
+    
+    ;; Verify minimum shares
+    (asserts! (>= shares-to-mint min-shares) ERR-SLIPPAGE-TOO-HIGH)
+    
+    ;; Transfer tokens
+    (try! (contract-call? (get token-x pool) transfer amount-x caller (as-contract tx-sender) none))
+    (try! (contract-call? (get token-y pool) transfer amount-y caller (as-contract tx-sender) none))
+    
+    ;; Update pool
+    (map-set pools
+        { pool-id: pool-id }
+        {
+            token-x: (get token-x pool),
+            token-y: (get token-y pool),
+            reserve-x: (+ (get reserve-x pool) amount-x),
+            reserve-y: (+ (get reserve-y pool) amount-y),
+            total-shares: (+ (get total-shares pool) shares-to-mint),
+            accumulated-fees-x: (get accumulated-fees-x pool),
+            accumulated-fees-y: (get accumulated-fees-y pool),
+            last-block-height: block-height
+        }
+    )
+    
+    ;; Update provider shares
+    (let ((provider-info (get-provider-shares pool-id caller)))
+        (map-set liquidity-providers
+            { pool-id: pool-id, provider: caller }
+            {
+                shares: (+ (get shares provider-info) shares-to-mint),
+                token-x-deposited: (+ (get token-x-deposited provider-info) amount-x),
+                token-y-deposited: (+ (get token-y-deposited provider-info) amount-y)
+            }
+        )
+    )
+    
+    (ok shares-to-mint))
+)
