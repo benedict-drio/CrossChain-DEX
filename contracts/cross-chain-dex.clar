@@ -1,11 +1,12 @@
-;; Import traits
-(use-trait nft-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
-(use-trait ft-trait .sip-010-trait-ft-standard.sip-010-trait)
+;; Import traits from local definitions
+(use-trait nft-trait .nft-trait.nft-trait)
+(use-trait ft-trait .sip-010-trait.sip-010-trait)
+
 
 ;; Cross-Chain DEX Smart Contract
 ;; Implements liquidity pools, order matching, and cross-chain swaps
 
-(impl-trait 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait.nft-trait)
+(impl-trait .nft-trait.nft-trait)
 
 ;; Error codes
 (define-constant ERR-NOT-AUTHORIZED (err u100))
@@ -135,6 +136,29 @@
 )
 
 ;; Public functions
+
+;; Required NFT trait function implementations
+(define-public (get-last-token-id)
+    (ok (var-get total-pools))
+)
+
+(define-public (get-token-uri (token-id uint))
+    (ok none)
+)
+
+(define-public (get-owner (token-id uint))
+    (match (map-get? pools { pool-id: token-id })
+        pool (ok (some (var-get contract-owner)))
+        (ok none)
+    )
+)
+
+(define-public (transfer (token-id uint) (sender principal) (recipient principal))
+    (begin
+        (asserts! (is-eq tx-sender sender) ERR-NOT-AUTHORIZED)
+        (ok false)
+    )
+)
 
 (define-public (create-pool (token-x <ft-trait>) (token-y <ft-trait>) (initial-x uint) (initial-y uint))
     (let (

@@ -9,6 +9,16 @@ requirements = []
 path = 'contracts/cross-chain-dex.clar'
 clarity_version = 2
 epoch = 2.5
+
+[contracts.nft-trait]
+path = 'contracts/nft-trait.clar'
+clarity_version = 2
+epoch = 2.5
+
+[contracts.sip-010-trait]
+path = 'contracts/sip-010-trait.clar'
+clarity_version = 2
+epoch = 2.5
 [repl.analysis]
 passes = ['check_checker']
 
