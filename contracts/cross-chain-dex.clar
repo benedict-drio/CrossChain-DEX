@@ -243,3 +243,27 @@
         current-pools
     )
 )
+
+(define-private (calculate-liquidity-shares 
+    (pool { 
+        token-x: principal, 
+        token-y: principal, 
+        reserve-x: uint, 
+        reserve-y: uint, 
+        total-shares: uint,
+        accumulated-fees-x: uint,
+        accumulated-fees-y: uint,
+        last-block-height: uint
+    })
+    (amount-x uint)
+    (amount-y uint)
+)
+    (let (
+        (share-ratio-x (div (* amount-x (get total-shares pool)) (get reserve-x pool)))
+        (share-ratio-y (div (* amount-y (get total-shares pool)) (get reserve-y pool)))
+    )
+    (if (< share-ratio-x share-ratio-y)
+        share-ratio-x
+        share-ratio-y
+    ))
+)
