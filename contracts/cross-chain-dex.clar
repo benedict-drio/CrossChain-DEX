@@ -19,3 +19,8 @@
 (define-constant LP-FEE u27)      ;; 0.27%
 (define-constant TOTAL-FEE u30)   ;; 0.3%
 (define-constant MINIMUM-LIQUIDITY u1000)
+
+;; Data Variables
+(define-data-var contract-owner principal tx-sender)
+(define-data-var emergency-shutdown bool false)
+(define-data-var last-price-update uint u0)
