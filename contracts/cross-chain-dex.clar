@@ -103,3 +103,46 @@
         (err ERR-POOL-NOT-FOUND)
     )
 )
+
+;; Public functions
+
+(define-public (create-pool (token-x principal) (token-y principal) (initial-x uint) (initial-y uint))
+    (let (
+        (pool-id (get-next-pool-id))
+        (caller tx-sender)
+    )
+    (asserts! (is-eq caller (var-get contract-owner)) ERR-NOT-AUTHORIZED)
+    (asserts! (> initial-x u0) ERR-INVALID-AMOUNT)
+    (asserts! (> initial-y u0) ERR-INVALID-AMOUNT)
+    
+    ;; Transfer initial liquidity
+    (try! (contract-call? token-x transfer initial-x caller (as-contract tx-sender) none))
+    (try! (contract-call? token-y transfer initial-y caller (as-contract tx-sender) none))
+    
+    ;; Create pool
+    (map-set pools 
+        { pool-id: pool-id }
+        {
+            token-x: token-x,
+            token-y: token-y,
+            reserve-x: initial-x,
+            reserve-y: initial-y,
+            total-shares: initial-x,
+            accumulated-fees-x: u0,
+            accumulated-fees-y: u0,
+            last-block-height: block-height
+        }
+    )
+    
+    ;; Set initial LP tokens
+    (map-set liquidity-providers
+        { pool-id: pool-id, provider: caller }
+        {
+            shares: initial-x,
+            token-x-deposited: initial-x,
+            token-y-deposited: initial-y
+        }
+    )
+    
+    (ok pool-id))
+)
