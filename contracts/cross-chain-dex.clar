@@ -24,3 +24,18 @@
 (define-data-var contract-owner principal tx-sender)
 (define-data-var emergency-shutdown bool false)
 (define-data-var last-price-update uint u0)
+
+;; Data Maps
+(define-map pools 
+    { pool-id: uint } 
+    {
+        token-x: principal,
+        token-y: principal,
+        reserve-x: uint,
+        reserve-y: uint,
+        total-shares: uint,
+        accumulated-fees-x: uint,
+        accumulated-fees-y: uint,
+        last-block-height: uint
+    }
+)
