@@ -235,3 +235,11 @@
     (ok amount-out))
 )
 
+;; Private functions
+
+(define-private (get-next-pool-id)
+    (let ((current-pools (var-get total-pools)))
+        (var-set total-pools (+ current-pools u1))
+        current-pools
+    )
+)
